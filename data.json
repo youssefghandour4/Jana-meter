@@ -1,0 +1,21 @@
+{
+  "friend": "Jana",
+  "me": "Youssef",
+  "arrival": "2026-12-11",
+  "threshold": 75,
+  "startScore": 20,
+  "log": [
+    { "date": "2026-10-14", "text": "Meter launched. Starting score reflects recent texting performance.", "points": 0 }
+  ],
+  "rules": [
+    { "text": "Texting Youssef first", "points": 10 },
+    { "text": "Replying within an hour", "points": 5 },
+    { "text": "Sending a voice note", "points": 15 },
+    { "text": "Asking how his day was (and meaning it)", "points": 10 },
+    { "text": "Bringing a gift to Egypt", "points": 20 },
+    { "text": "Dry \"haha\" or \"lol\"", "points": -5 },
+    { "text": "Leaving him on seen", "points": -10 },
+    { "text": "Disappearing for a week", "points": -20 }
+  ],
+  "appeals": []
+}

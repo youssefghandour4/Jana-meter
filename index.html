@@ -1,0 +1,253 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Jana Satisfaction Meter</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@500;700;800&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #fff7ec;
+    --card: #ffffff;
+    --ink: #1d1a17;
+    --muted: #7a7068;
+    --line: #eadfd2;
+    --red: #e5484d;
+    --amber: #f5a524;
+    --green: #2fb36d;
+    --gold: #c9a227;
+    --accent: #ff6b35;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0; background: var(--bg); color: var(--ink);
+    font-family: Inter, system-ui, sans-serif; line-height: 1.5;
+  }
+  .wrap { max-width: 560px; margin: 0 auto; padding: 24px 16px 60px; }
+  h1, h2, .big { font-family: "Bricolage Grotesque", Inter, sans-serif; }
+  header { text-align: center; margin-bottom: 18px; }
+  .kicker { font-size: 12px; letter-spacing: .14em; text-transform: uppercase; color: var(--accent); font-weight: 600; }
+  h1 { font-size: 32px; line-height: 1.1; margin: 6px 0 4px; font-weight: 800; }
+  .sub { color: var(--muted); font-size: 14px; margin: 0; }
+  .card {
+    background: var(--card); border: 1px solid var(--line); border-radius: 20px;
+    padding: 20px; margin-top: 16px; box-shadow: 0 2px 0 var(--line);
+  }
+  h2 { font-size: 20px; margin: 0 0 12px; }
+  .gauge { display: block; width: 100%; max-width: 360px; margin: 0 auto; }
+  .score { text-align: center; margin-top: -6px; }
+  .score .big { font-size: 56px; font-weight: 800; line-height: 1; }
+  .badge {
+    display: inline-block; margin-top: 10px; padding: 6px 14px; border-radius: 999px;
+    font-weight: 600; font-size: 14px; color: #fff;
+  }
+  .verdict { color: var(--muted); font-size: 14px; margin: 10px 0 0; text-align: center; }
+  .countdown { display: flex; align-items: center; gap: 14px; }
+  .countdown .big { font-size: 48px; font-weight: 800; color: var(--accent); line-height: 1; }
+  .countdown p { margin: 0; font-size: 14px; color: var(--muted); }
+  .countdown strong { color: var(--ink); }
+  ul.list { list-style: none; padding: 0; margin: 0; }
+  ul.list li {
+    display: flex; justify-content: space-between; gap: 12px; align-items: flex-start;
+    padding: 10px 0; border-top: 1px solid var(--line); font-size: 14px;
+  }
+  ul.list li:first-child { border-top: 0; }
+  .date { display: block; font-size: 12px; color: var(--muted); }
+  .pts { font-weight: 700; white-space: nowrap; font-family: "Bricolage Grotesque", sans-serif; }
+  .pos { color: var(--green); } .neg { color: var(--red); } .zero { color: var(--muted); }
+  .empty { color: var(--muted); font-size: 14px; margin: 0; }
+  textarea {
+    width: 100%; min-height: 90px; border: 1px solid var(--line); border-radius: 12px;
+    padding: 12px; font: inherit; font-size: 15px; resize: vertical; background: #fffdf9; color: var(--ink);
+  }
+  button {
+    margin-top: 10px; width: 100%; border: 0; border-radius: 12px; padding: 13px;
+    background: var(--ink); color: #fff; font: inherit; font-weight: 600; font-size: 15px; cursor: pointer;
+  }
+  button:disabled { opacity: .5; }
+  .note { font-size: 13px; color: var(--muted); margin: 8px 0 0; }
+  .status { font-size: 12px; font-weight: 700; padding: 2px 8px; border-radius: 999px; white-space: nowrap; }
+  .accepted { background: #e3f6ec; color: var(--green); }
+  .rejected { background: #fde8e8; color: var(--red); }
+  .pending { background: #fff1d6; color: #a86e00; }
+  footer { text-align: center; color: var(--muted); font-size: 12px; margin-top: 28px; }
+  @keyframes pop { from { transform: scale(.9); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+  .score { animation: pop .5s ease-out; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <div class="kicker">Official · Non-negotiable</div>
+    <h1 id="title">Jana Satisfaction Meter</h1>
+    <p class="sub" id="subtitle">Determines whether a meeting will be granted.</p>
+  </header>
+
+  <section class="card">
+    <svg class="gauge" viewBox="0 0 200 115" aria-hidden="true">
+      <defs>
+        <linearGradient id="g" x1="0" x2="1">
+          <stop offset="0" stop-color="#e5484d"/>
+          <stop offset=".5" stop-color="#f5a524"/>
+          <stop offset=".8" stop-color="#2fb36d"/>
+          <stop offset="1" stop-color="#c9a227"/>
+        </linearGradient>
+      </defs>
+      <path d="M20 100 A80 80 0 0 1 180 100" fill="none" stroke="#eadfd2" stroke-width="16" stroke-linecap="round"/>
+      <path id="arc" d="M20 100 A80 80 0 0 1 180 100" fill="none" stroke="url(#g)" stroke-width="16" stroke-linecap="round"
+            pathLength="100" stroke-dasharray="0 100" style="transition: stroke-dasharray 1.2s ease-out"/>
+      <line id="threshold" x1="100" y1="12" x2="100" y2="32" stroke="#1d1a17" stroke-width="2.5" stroke-dasharray="3 2"/>
+      <g id="needle" style="transform-origin:100px 100px; transform: rotate(-90deg); transition: transform 1.2s cubic-bezier(.3,1.4,.5,1)">
+        <line x1="100" y1="100" x2="100" y2="34" stroke="#1d1a17" stroke-width="4" stroke-linecap="round"/>
+      </g>
+      <circle cx="100" cy="100" r="8" fill="#1d1a17"/>
+    </svg>
+    <div class="score">
+      <div class="big"><span id="score">–</span>%</div>
+      <span class="badge" id="badge">Loading…</span>
+    </div>
+    <p class="verdict" id="verdict"></p>
+  </section>
+
+  <section class="card countdown">
+    <div class="big" id="days">–</div>
+    <p id="countText"></p>
+  </section>
+
+  <section class="card">
+    <h2>Recent activity</h2>
+    <ul class="list" id="log"></ul>
+  </section>
+
+  <section class="card">
+    <h2>How to earn points</h2>
+    <ul class="list" id="rules"></ul>
+  </section>
+
+  <section class="card">
+    <h2>File an appeal</h2>
+    <form name="appeal" method="POST" data-netlify="true" netlify-honeypot="bot-field" id="appealForm">
+      <input type="hidden" name="form-name" value="appeal">
+      <p hidden><label>Skip this: <input name="bot-field"></label></p>
+      <textarea name="excuse" id="excuse" placeholder="Explain yourself. Be convincing." required></textarea>
+      <button type="submit" id="appealBtn">Submit appeal</button>
+      <p class="note" id="appealNote">The committee (one person) will review it.</p>
+    </form>
+    <ul class="list" id="appeals" style="margin-top:14px"></ul>
+  </section>
+
+  <footer id="footer"></footer>
+</div>
+
+<script>
+const FALLBACK = {
+  friend: "Jana", me: "Youssef", arrival: "2026-12-11", threshold: 75, startScore: 20,
+  log: [], rules: [], appeals: []
+};
+
+const TIERS = [
+  { min: 90, label: "👑 Koshary privileges", color: "#c9a227", text: name => `${name} has achieved elite status. Food is on Youssef.` },
+  { min: null, label: "✅ Meeting approved", color: "#2fb36d", text: name => `${name} may proceed to meet Youssef. Don't ruin it.` },
+  { min: 50, label: "⚠️ On probation", color: "#f5a524", text: name => `Close, but ${name} needs to try harder.` },
+  { min: 0, label: "🔒 Meeting locked", color: "#e5484d", text: name => `${name} is not currently eligible for a meeting.` }
+];
+
+function esc(s) {
+  return String(s).replace(/[&<>"']/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+}
+function fmtPts(p) {
+  const cls = p > 0 ? "pos" : p < 0 ? "neg" : "zero";
+  return `<span class="pts ${cls}">${p > 0 ? "+" : ""}${p}</span>`;
+}
+function fmtDate(d) {
+  const dt = new Date(d + "T12:00:00");
+  return isNaN(dt) ? esc(d) : dt.toLocaleDateString("en-GB", { day: "numeric", month: "short" });
+}
+
+function render(data) {
+  const name = data.friend, me = data.me, threshold = data.threshold;
+  document.getElementById("title").textContent = `${name} Satisfaction Meter`;
+  document.getElementById("subtitle").textContent = `Determines whether ${name} gets to meet ${me}.`;
+  document.title = `${name} Satisfaction Meter`;
+
+  const raw = data.startScore + (data.log || []).reduce((s, e) => s + Number(e.points || 0), 0);
+  const score = Math.max(0, Math.min(100, raw));
+
+  const tier = TIERS.find(t => score >= (t.min === null ? threshold : t.min));
+  document.getElementById("score").textContent = score;
+  const badge = document.getElementById("badge");
+  badge.textContent = tier.label;
+  badge.style.background = tier.color;
+  const need = threshold - score;
+  document.getElementById("verdict").textContent =
+    tier.text(name) + (need > 0 ? ` ${need} points to go.` : "");
+
+  requestAnimationFrame(() => {
+    document.getElementById("arc").setAttribute("stroke-dasharray", `${score} 100`);
+    document.getElementById("needle").style.transform = `rotate(${-90 + score * 1.8}deg)`;
+  });
+  const a = Math.PI * (1 - threshold / 100);
+  const t = document.getElementById("threshold");
+  t.setAttribute("x1", 100 + 92 * Math.cos(a)); t.setAttribute("y1", 100 - 92 * Math.sin(a));
+  t.setAttribute("x2", 100 + 68 * Math.cos(a)); t.setAttribute("y2", 100 - 68 * Math.sin(a));
+
+  const now = new Date();
+  const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+  const [y, m, d] = data.arrival.split("-").map(Number);
+  const days = Math.round((new Date(y, m - 1, d) - today) / 86400000);
+  const daysEl = document.getElementById("days"), ct = document.getElementById("countText");
+  if (days > 0) {
+    daysEl.textContent = days;
+    ct.innerHTML = `<strong>day${days === 1 ? "" : "s"} until ${esc(name)} lands in Egypt.</strong><br>That's ${days} day${days === 1 ? "" : "s"} left to fix this.`;
+  } else if (days === 0) {
+    daysEl.textContent = "🛬";
+    ct.innerHTML = `<strong>${esc(name)} lands today.</strong><br>The verdict above is final.`;
+  } else {
+    daysEl.textContent = "🇪🇬";
+    ct.innerHTML = `<strong>${esc(name)} is in Egypt.</strong><br>Score still counts.`;
+  }
+
+  const log = [...(data.log || [])].reverse();
+  document.getElementById("log").innerHTML = log.length
+    ? log.map(e => `<li><span>${esc(e.text)}<span class="date">${fmtDate(e.date)}</span></span>${fmtPts(Number(e.points || 0))}</li>`).join("")
+    : `<li><p class="empty">Nothing yet. Suspicious.</p></li>`;
+
+  document.getElementById("rules").innerHTML = (data.rules || [])
+    .map(r => `<li><span>${esc(r.text)}</span>${fmtPts(Number(r.points))}</li>`).join("");
+
+  const ap = [...(data.appeals || [])].reverse();
+  document.getElementById("appeals").innerHTML = ap
+    .map(x => `<li><span>“${esc(x.text)}”${x.reply ? `<span class="date">Ruling: ${esc(x.reply)}</span>` : ""}</span><span class="status ${esc(x.status || "pending")}">${esc(x.status || "pending")}</span></li>`)
+    .join("");
+
+  document.getElementById("footer").textContent =
+    `Score starts at ${data.startScore}. Meeting unlocks at ${threshold}%. All decisions by ${me} are final.`;
+}
+
+fetch("data.json?v=" + Date.now())
+  .then(r => { if (!r.ok) throw new Error(); return r.json(); })
+  .then(d => render({ ...FALLBACK, ...d }))
+  .catch(() => render(FALLBACK));
+
+document.getElementById("appealForm").addEventListener("submit", e => {
+  e.preventDefault();
+  const form = e.target, btn = document.getElementById("appealBtn"), note = document.getElementById("appealNote");
+  btn.disabled = true; btn.textContent = "Submitting…";
+  fetch("/", {
+    method: "POST",
+    headers: { "Content-Type": "application/x-www-form-urlencoded" },
+    body: new URLSearchParams(new FormData(form)).toString()
+  }).then(r => {
+    if (!r.ok) throw new Error();
+    form.reset();
+    btn.textContent = "Appeal submitted";
+    note.textContent = "Received. The committee will get back to you. Maybe.";
+  }).catch(() => {
+    btn.disabled = false; btn.textContent = "Submit appeal";
+    note.textContent = "That didn't go through. Try again, or just text him.";
+  });
+});
+</script>
+</body>
+</html>
