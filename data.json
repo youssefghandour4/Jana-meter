@@ -5,8 +5,10 @@
   "threshold": 75,
   "startScore": 20,
   "log": [
-    { "date": "2026-10-14", "text": "Meter launched. Starting score reflects recent texting performance.", "points": 0 }
-  ],
+  { "date": "2026-10-14", "text": "Meter launched. Starting score reflects recent texting performance.", "points": 0 },
+  { "date": "2026-10-14", "text": "Replied within an hour", "points": 5 }
+],
+
   "rules": [
     { "text": "Texting Youssef first", "points": 10 },
     { "text": "Replying within an hour", "points": 5 },
